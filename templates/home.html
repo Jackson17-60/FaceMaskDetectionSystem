@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<link rel="icon" href="{{ url_for('static',filename='css/patient.png') }}">
+<link href="http://fonts.cdnfonts.com/css/sofia-pro" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/main.css') }}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<title>Home</title>
+<style>
+    .noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+::-webkit-scrollbar {
+  width: 0; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+</style>
+<script>
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyBNpEAEnL3pviyeubFvLot3UGFfk6WxohQ",
+      authDomain: "testing-1c6cd.firebaseapp.com",
+      databaseURL: "https://testing-1c6cd-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "testing-1c6cd",
+      storageBucket: "testing-1c6cd.appspot.com",
+      messagingSenderId: "65765630850",
+      appId: "1:65765630850:web:5d27e89aaead57b192259b",
+      measurementId: "G-1WZETH63TV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+</script>
+</head>
+<body>
+
+
+    <nav style="margin: 2.4% 2% 1% 8%;">
+        <a class="tab" style="font-size:16px;color: #40b090;" href="#">Home</a>
+        <a class="tab" style="font-size:16px;" href="{{ url_for('database') }}">Database</a>
+        <div class="animation start-home"></div>
+    </nav>
+	<div style="display: flex;">
+        <div class="wrap" style="width:1600px;position:relative;">
+            <img class="webcam-wrapper" src="{{ url_for('video') }}">
+            <span class="live"><span style="font-size:26px;">•</span>&nbspLive</span>
+        </div>
+			<div class="detected-face-wrapper">
+				<div class='current_date'>26-09-2021</div>
+				<div class="inner-detected-face-wrapper"></div>
+			</div>
+	</div>
+
+
+
+
+</body>
+<script>
+var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var yyyy = today.getFullYear();
+
+  today = dd + '-' + mm + '-' + yyyy;
+  $('.current_date').text(today);
+
+
+    firebase.database().ref().child(today).limitToLast(3).on('child_added', (data) => {
+            var image_date_time = data.val().date_time;
+            var replaced_image_date_time = image_date_time.replace("_"," ").replace(today,"").replace(".jpg","")
+
+            var html = `<div class="animate__animated animate__slideInDown card">
+                        <img class="card_image" alt="loading" src="${data.val().url}"></img>
+                        <div class='card_status'>${replaced_image_date_time}</div>
+                        </div>`
+
+            $(".inner-detected-face-wrapper").prepend(html);
+
+
+
+    });
+</script>
+</html>
+

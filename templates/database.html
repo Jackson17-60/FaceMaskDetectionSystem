@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<head>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="{{url_for('static', filename='js/mc-calendar.min.js')}}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<link rel="icon" href="{{ url_for('static',filename='css/patient.png') }}">
+<link href="http://fonts.cdnfonts.com/css/sofia-pro" rel="stylesheet">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/mc-calendar.min.css') }}">
+       <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/main.css') }}">
+       <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/database.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<title>Database</title>
+
+
+<script>
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyBNpEAEnL3pviyeubFvLot3UGFfk6WxohQ",
+      authDomain: "testing-1c6cd.firebaseapp.com",
+      databaseURL: "https://testing-1c6cd-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "testing-1c6cd",
+      storageBucket: "testing-1c6cd.appspot.com",
+      messagingSenderId: "65765630850",
+      appId: "1:65765630850:web:5d27e89aaead57b192259b",
+      measurementId: "G-1WZETH63TV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+</script>
+</head>
+<body>
+<div class="meter"></div>
+<p class="message">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+
+          {% endif %}
+        {% endwith %}
+    </p>
+ {% if filename %}
+        {% if image_value %}
+    <div class="modal">
+      <div class="modal-content">
+        <span onclick='closeModal()'class="close">&times;</span>
+          <img class="image_wrapper" src ="{{ url_for('display_image', filename=filename) }}"/>
+        <!-- <img class="image_wrapper" src ="/Users/jun/Desktop/images_videos/jwmask.jpg"/> -->
+        </div>
+    </div>
+        {% else %}
+    <div class="modal">
+        <div class="modal-content">
+                <div class="meter"></div>
+            <span onclick='closeModal()' class="close">&times;</span>
+            <video class="video_wrapper" controls autoplay>
+                <source src="{{ url_for('display_video', filename=filename) }}" type="video/mp4">
+            </video>
+        </div>
+    </div>
+   {% endif %}
+     {% endif %}
+<div class="header">
+    <nav>
+        <a class="tab" style="font-size:16px;" href="{{ url_for('home') }}">Home</a>
+        <a class="tab" style="font-size: 16px;color: #40b090;" href="{{ url_for('database') }}">Database</a>
+
+        <div class="animation start-database"></div>
+    </nav>
+
+    <div class="button-wrapper">
+        <form method="post" action="/database.html" id="form_upload" enctype="multipart/form-data">
+        <dl>
+        <label style="margin-right: 5px;padding: 14px;" for="file-upload" class="filter_button">
+            <i style="color: #40b090;" class="fa fa-upload" aria-hidden="false"></i>&nbsp&nbspUpload</label>
+        <input autocomplete="off" name="file" id="file-upload" type="file" hidden required/>
+                </dl>
+    </form>
+        <button style="margin-top: 7px;width: 115.25px;"class="filter_button" id="datepicker_field"><i style="color: #40b090;" class="fa fa-sliders" aria-hidden="false"></i>&nbsp&nbspFilter</button>
+    </div>
+
+</div>
+
+    <div class="table-wrapper">
+        <div class="title">
+            <span>Face</span>
+            <span>Day</span>
+            <span>Date</span>
+            <span>Time</span>
+            <span>Action</span></div>
+        <div style="overflow:auto;height:850px;" class="database-wrapper"></div>
+    </div>
+
+
+</body>
+<script>
+    var current_date;
+    var today = new Date();
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+$( document ).ready(function() {
+        var today = new Date();
+        // loadData("Sun Oct 2 2021 07:48:42 GMT+0800 (Malaysia Time)");
+        loadData(today)
+        noData();
+});
+  const myDatePicker = MCDatepicker.create({
+          el: '#datepicker_field',
+          dateFormat: 'dddd, dd-mmmm-yy'
+    })
+
+function loadData(selected_date){
+
+    current_date = new Date(selected_date);
+    var dd = String(current_date.getDate()).padStart(2, '0');
+    var mm = String(current_date.getMonth() + 1).padStart(2, '0');
+    var yyyy = current_date.getFullYear();
+    var weekday= ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var day = weekday[current_date.getDay()];
+
+    current_date = dd + '-' + mm + '-' + yyyy;
+    console.log(current_date)
+    firebase.database().ref().child(current_date).on('child_added', (data) => {
+            var image_date_time = data.val().date_time;
+            var replaced_image_date_time = image_date_time.replace("_"," ").replace(current_date,"").replace(".jpg","")
+            var html = `<div data-key="${data.key}" class='animate__animated database_container'>
+                            <img alt="loading" class='detected_face_img' src="${data.val().url}"></img>
+                            <div class='card_description'>
+                                <span style="padding-left: 7rem;">${day}</span>
+                                <span style="padding-left: 4.8rem;">${current_date}</span>
+                                <span style="padding-left: 5.8rem;">${replaced_image_date_time}</span>
+                                <button class='delete_button' onclick='remove($(this).parent().parent())' class='noselect'>
+                                    <span class='text'>Delete</span>
+                                    <span class='icon'>
+                                        <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'>
+                                            <path d='M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z'/>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>`
+
+            $(".database-wrapper").prepend(html);
+
+            noData();
+            const element = document.querySelector('.database_container');
+            element.classList.add('animate__slideInUp');
+    });}
+
+myDatePicker.onSelect((date, today) => {
+        $('.database-wrapper').empty();
+        $(".database-wrapper").append("<div style='align-items:center;' class='animate__animated animate__slideInUp database_container'><p style='color:#999da9;margin:0 auto;'class='no_data'>No data</p></div>");
+        loadData(date)
+
+});
+function remove(db_card){
+  db_card.slideUp('slow',function() {
+    db_card.remove();
+    var key = db_card.data('key')
+    firebase.database().ref(current_date).child(key).remove();
+
+    });
+
+}
+function noData(){
+    if ($(".database-wrapper").length){
+            $( ".no_data" ).parent().remove();
+        }
+}
+
+
+function closeModal(){
+    $(".modal").fadeOut();
+        $('.video_wrapper').trigger('pause');
+
+}
+$(document).click(function (e) {
+    if ($(e.target).is('.modal')) {
+          closeModal()
+    }
+
+});
+
+$("#file-upload").on("change", function (e) {
+  var file =  e.target.files[0].name;
+  if($('#file-upload').value != "") {
+   $("#form_upload").submit();
+    if (file.toLowerCase().indexOf("mp4") >= 0){
+    $(".meter").addClass("done");
+    $('.meter').css('transition', '14s');
+    $('.meter').css('width', '100%');
+  }
+  else{
+    $(".meter").addClass("done");
+   $('.meter').css('width', '100%');
+  }
+}
+});
+
+</script>
+</html>
+
