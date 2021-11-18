@@ -129,7 +129,7 @@ function loadData(selected_date){
     console.log(current_date)
     firebase.database().ref().child(current_date).on('child_added', (data) => {
             var image_date_time = data.val().date_time;
-            var replaced_image_date_time = image_date_time.replace("_"," ").replace(current_date,"").replace(".jpg","")
+            var replaced_image_date_time = image_date_time.slice(10);
             var html = `<div data-key="${data.key}" class='animate__animated database_container'>
                             <img alt="loading" class='detected_face_img' src="${data.val().url}"></img>
                             <div class='card_description'>
