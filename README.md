@@ -8,6 +8,9 @@ Download dataset from https://drive.google.com/drive/folders/1aAXDTl5kMPKAHE08WK
 
 The dataset for this pre-trained network is provided by https://github.com/VictorLin000/YOLOv3_mask_detect which contains 678 images of people with and without masks.
 
+# Database
+Firebase database is used and a testing database is created for this case. User can create their own
+
 # Classes
 
 NONE - No mask at all.
