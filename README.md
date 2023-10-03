@@ -1,4 +1,4 @@
-##🎭 Face Mask Detection System based on YOLO
+# 🎭Face Mask Detection System based on YOLO
 ![face 1 47 06 PM](https://user-images.githubusercontent.com/69899426/142359428-77bd8e4e-3471-402c-ab63-195024d5710b.jpeg)
 
 📦 Dataset
