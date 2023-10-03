@@ -28,7 +28,7 @@ To download the models, you can either run download-models.sh in the /models dir
 For the full-sized YOLOv3 pre-trained network, please visit here.
 
 # 📺 Demo Images and Videos
-[Google Drive](https://drive.google.com/drive/folders/1tbqElh98EyqO7uXSVx5wrNaKg_Tpn6QG?usp=sharing)
+Available on [Google Drive](https://drive.google.com/drive/folders/1tbqElh98EyqO7uXSVx5wrNaKg_Tpn6QG?usp=sharing)
 
 # 🔧 How to Run
 1. Clone the project.
